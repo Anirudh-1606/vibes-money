@@ -11,13 +11,20 @@ import {
 import { useApp } from "../context/AppContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Snackbar } from "react-native-paper";
+import { removeUser } from "../utils";
 
 const HomeScreen = () => {
 	const API_URL = "http://192.168.31.21:5500";
 	const [inputValue, setInputValue] = useState("");
+	const { isAuthenticated, setIsAuthenticated } = useApp();
 	const { displayName, pfp, signerUuid } = useApp();
 	const [snackbarVisible, setSnackbarVisible] = useState(false);
 	const [snackbarMessage, setSnackbarMessage] = useState("");
+
+	const handleSignOut = () => {
+		setIsAuthenticated(false);
+		removeUser();
+	};
 
 	const handleCastPress = async () => {
 		Keyboard.dismiss();
@@ -49,21 +56,27 @@ const HomeScreen = () => {
 
 	return displayName && pfp ? (
 		<SafeAreaView style={styles.container}>
-			<View style={styles.leftContainer}>
-				<Image
-					source={{
-						uri: pfp,
-					}}
-					style={styles.avatar}
-				/>
+			<View style={styles.topBar}>
+				<View style={styles.leftContainer}>
+					<Image
+						source={{
+							uri: pfp,
+						}}
+						style={styles.avatar}
+					/>
 
-				<Text style={styles.username}>{displayName}</Text>
+					<Text style={styles.username}>{displayName}</Text>
+				</View>
+				<View style={styles.rightContainer}>
+					<TouchableOpacity onPress={handleSignOut}>
+						<Text style={{ color: "white" }}>Logout</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 			<View>
 				<TextInput
 					style={{
 						flex: 1,
-						height: "300",
 						color: "white",
 						borderWidth: 1,
 						borderColor: "white",
@@ -72,12 +85,10 @@ const HomeScreen = () => {
 						paddingBottom: 20,
 						fontSize: 16,
 						marginTop: 20,
-						placeholderTextColor: "white",
 					}}
 					placeholder="Say Something"
 					value={inputValue}
 					onChangeText={setInputValue}
-					placeholderTextColor="#b8b8b8ff"
 					multiline={true}
 					numberOfLines={8}
 					textAlignVertical="top"
@@ -110,6 +121,13 @@ const styles = StyleSheet.create({
 		padding: 20,
 	},
 
+	topBar: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 20,
+	},
+
 	leftContainer: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -127,7 +145,6 @@ const styles = StyleSheet.create({
 		paddingTop: 10,
 		borderWidth: 1,
 		borderColor: "white",
-		height: "50%",
 		width: "100%",
 	},
 	castButton: {
@@ -135,10 +152,11 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		padding: 20,
 		backgroundColor: "#7F35FF",
-		marginTop: "20%",
+		marginTop: 20,
 	},
 	castButtonText: {
 		color: "white",
+		fontFamily: "Poppins-Regular",
 		fontSize: 16,
 	},
 	username: {
