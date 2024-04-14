@@ -1,40 +1,23 @@
-import {
-	NeynarSigninButton,
-	ISuccessMessage,
-} from "@neynar/react-native-signin";
-
+import { NeynarSigninButton } from "@neynar/react-native-signin";
+import { useApp } from "../context/AppContext";
 const NEYNAR_API_KEY = "D41505D1-7B44-440D-958B-DF4F7BD16ABD";
 const NEYNAR_CLIENT_ID = "f4b3ab5b-f6b6-4826-b90b-bcab0f9ce9e1";
-const API_URL = "https://hub-api.neynar.com";
 
 const SigninScreen = () => {
-	const handleSignin = async (data) => {
-		console.log(
-			`User with fid -> ${data.fid} can use signer -> ${data.signer_uuid} to interact with farcaster`,
-		);
-	};
+	const { handleSignin } = useApp();
 
 	const handleError = (err) => {
 		console.log(err);
 	};
 
 	const fetchAuthorizationUrl = async () => {
-		const options = {
-			method: "GET",
-			headers: {
-				accept: "application/json",
-				api_key: "NEYNAR_API_KEY",
-				client_id: "NEYNAR_CLIENT_ID",
-			},
-		};
-
-		fetch(
-			"https://api.neynar.com/v2/farcaster/login/authorize?response_type=code",
-			options,
-		)
-			.then((response) => response.json())
-			.then((response) => console.log(response))
-			.catch((err) => console.error(err));
+		const res = await fetch(`http://192.168.31.21:5500/get-auth-url`);
+		if (!res.ok) {
+			throw new Error("Failed to fetch auth url");
+		}
+		const { authorization_url } = await res.json();
+		console.log(authorization_url);
+		return authorization_url;
 	};
 
 	return (

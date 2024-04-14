@@ -1,17 +1,32 @@
-import { StatusBar } from "expo-status-bar";
-import {
-	StyleSheet,
-	Text,
-	View,
-	TouchableOpacity,
-	Image,
-	Button,
-	Alert,
-	SafeAreaView,
-} from "react-native";
+import React, { useEffect, useRef } from "react";
+import { CommonActions, NavigationContainer } from "@react-navigation/native";
+import { AppProvider, useApp } from "./src/context/AppContext";
+import AppNavigator from "./src/AppNavigator";
 import { useFonts } from "expo-font";
-import Intro from "./src/pages/IntroScreen";
-import SigninScreen from "./src/pages/SigninScreen";
+
+const AuthNavigation = () => {
+	const { isAuthenticated } = useApp();
+	const navigationRef = useRef(null);
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigationRef.current?.dispatch(
+				CommonActions.reset({
+					index: 0,
+					routes: [{ name: "Home" }],
+				}),
+			);
+		} else {
+			navigationRef.current?.navigate("Signin");
+		}
+	}, [isAuthenticated]);
+
+	return (
+		<NavigationContainer ref={navigationRef}>
+			<AppNavigator />
+		</NavigationContainer>
+	);
+};
 
 export default function App() {
 	const [fontsLoaded, fontError] = useFonts({
@@ -23,16 +38,8 @@ export default function App() {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<SigninScreen />
-		</SafeAreaView>
+		<AppProvider>
+			<AuthNavigation />
+		</AppProvider>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-});
