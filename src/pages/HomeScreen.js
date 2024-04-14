@@ -13,8 +13,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Snackbar } from "react-native-paper";
 import { removeUser } from "../utils";
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
 	const API_URL = "http://192.168.31.21:5500";
+
 	const [inputValue, setInputValue] = useState("");
 	const { isAuthenticated, setIsAuthenticated } = useApp();
 	const { displayName, pfp, signerUuid } = useApp();
@@ -54,17 +55,22 @@ const HomeScreen = () => {
 		}
 	};
 
+	const handleImagePress = () => {
+		navigation.navigate("Profile");
+	};
+
 	return displayName && pfp ? (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.topBar}>
 				<View style={styles.leftContainer}>
-					<Image
-						source={{
-							uri: pfp,
-						}}
-						style={styles.avatar}
-					/>
-
+					<TouchableOpacity onPress={handleImagePress}>
+						<Image
+							source={{
+								uri: pfp,
+							}}
+							style={styles.avatar}
+						/>
+					</TouchableOpacity>
 					<Text style={styles.username}>{displayName}</Text>
 				</View>
 				<View style={styles.rightContainer}>
